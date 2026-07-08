@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using EPiServer;
+using EPiServer.Security;
 using EPiServer.Web;
 using EPiServer.Web.Mvc.Html;
 using Microsoft.AspNetCore.Mvc;
@@ -44,6 +44,9 @@ public static class IServiceCollectionExtensions
                 var renderer = new AdvancedContentAreaRenderer(
                     sp.GetRequiredService<IContentAreaLoader>(),
                     sp.GetRequiredService<IReadOnlyCollection<DisplayModeFallback>>(),
+                    sp.GetRequiredService<IPrincipalAccessor>(),
+                    sp.GetRequiredService<IEnumerable<IContentAreaItemsRenderingFilter>>(),
+                    sp.GetRequiredService<IContextModeResolver>(),
                     o);
 
                 renderer.SetElementStartTagRenderCallback(o.ItemStartRenderCallback);
