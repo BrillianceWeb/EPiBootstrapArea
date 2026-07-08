@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.2.32210.308
+# Visual Studio Version 18
+VisualStudioVersion = 18.8.11925.187 insiders
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdvancedContentArea", "AdvancedContentArea\AdvancedContentArea.csproj", "{78CC7937-30D4-493B-970D-3E1528D19CA8}"
 EndProject
@@ -15,6 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution items", "solution 
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdvancedContentArea.Forms", "AdvancedContentArea.Forms\AdvancedContentArea.Forms.csproj", "{E6B60D95-1D3C-495C-A1E8-57564748973A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdvancedContentArea.Tests", "AdvancedContentArea.Tests\AdvancedContentArea.Tests.csproj", "{49DAFA3F-3827-597A-EE6F-7EE49143D2B3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,11 +32,13 @@ Global
 		{E6B60D95-1D3C-495C-A1E8-57564748973A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E6B60D95-1D3C-495C-A1E8-57564748973A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E6B60D95-1D3C-495C-A1E8-57564748973A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49DAFA3F-3827-597A-EE6F-7EE49143D2B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49DAFA3F-3827-597A-EE6F-7EE49143D2B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49DAFA3F-3827-597A-EE6F-7EE49143D2B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49DAFA3F-3827-597A-EE6F-7EE49143D2B3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0338450F-E8B5-49A9-9CDC-F819FD95E19B}
