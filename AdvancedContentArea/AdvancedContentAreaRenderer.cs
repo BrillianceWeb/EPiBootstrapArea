@@ -6,8 +6,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Principal;
+using System.Threading.Tasks;
 using EPiServer;
 using EPiServer.Core;
+using EPiServer.Security;
 using EPiServer.Web;
 using EPiServer.Web.Mvc.Html;
 using HtmlAgilityPack;
@@ -32,6 +35,9 @@ public class AdvancedContentAreaRenderer : ContentAreaRenderer
     private Action<HtmlNode, ContentAreaItem, IContentData> _elementStartTagRenderCallback;
     private IEnumerable<DisplayModeFallback> _fallbacks;
     private readonly IContentAreaLoader _contentAreaLoader;
+    private readonly IPrincipalAccessor _principalAccessor;
+    private readonly IEnumerable<IContentAreaItemsRenderingFilter> _contentAreaItemsRenderingFilters;
+    private readonly IContextModeResolver _contextModeResolver;
     internal readonly AdvancedContentAreaRendererOptions Options;
 
     /// <summary>
@@ -39,13 +45,23 @@ public class AdvancedContentAreaRenderer : ContentAreaRenderer
     /// </summary>
     /// <param name="contentAreaLoader">Loads content referenced by content area items.</param>
     /// <param name="fallbacks">Bootstrap display mode fallbacks used for layout and CSS classes.</param>
+    /// <param name="principalAccessor"></param>
+    /// <param name="contentAreaItemsRenderingFilters"></param>
+    /// <param name="contextModeResolver"></param>
     /// <param name="options">Renderer configuration options.</param>
     public AdvancedContentAreaRenderer(
         IContentAreaLoader contentAreaLoader,
-        IReadOnlyCollection<DisplayModeFallback> fallbacks, AdvancedContentAreaRendererOptions options)
+        IReadOnlyCollection<DisplayModeFallback> fallbacks,
+        IPrincipalAccessor principalAccessor,
+        IEnumerable<IContentAreaItemsRenderingFilter> contentAreaItemsRenderingFilters,
+        IContextModeResolver contextModeResolver,
+        AdvancedContentAreaRendererOptions options)
     {
         _fallbacks = fallbacks ?? throw new ArgumentNullException(nameof(fallbacks));
         _contentAreaLoader = contentAreaLoader ?? throw new ArgumentNullException(nameof(contentAreaLoader));
+        _principalAccessor = principalAccessor;
+        _contentAreaItemsRenderingFilters = contentAreaItemsRenderingFilters;
+        _contextModeResolver = contextModeResolver;
         Options = options;
     }
 
@@ -99,7 +115,20 @@ public class AdvancedContentAreaRenderer : ContentAreaRenderer
             viewContext.Writer.Write(tagBuilder.RenderStartTag());
         }
 
-        RenderContentAreaItems(htmlHelper, contentArea.Items);
+        List<ContentAreaItem> list = new List<ContentAreaItem>(contentArea.Items);
+        IPrincipal principal = _principalAccessor.Principal;
+        ContextMode currentMode = _contextModeResolver.CurrentMode;
+        foreach (IContentAreaItemsRenderingFilter contentAreaItemsRenderingFilter in _contentAreaItemsRenderingFilters)
+        {
+            ValueTask valueTask = contentAreaItemsRenderingFilter.FilterAsync(list, principal, currentMode);
+            if (!valueTask.IsCompleted)
+            {
+                valueTask.AsTask().ConfigureAwait(continueOnCapturedContext: false).GetAwaiter()
+                    .GetResult();
+            }
+        }
+
+        RenderContentAreaItems(htmlHelper, list);
 
         if (tagBuilder == null)
         {
@@ -128,11 +157,12 @@ public class AdvancedContentAreaRenderer : ContentAreaRenderer
         }
 
         var rowRender = new RowRenderer();
-        rowRender.Render(contentAreaItems,
-                         htmlHelper,
-                         GetContentAreaItemTemplateTag,
-                         GetColumnWidth,
-                         base.RenderContentAreaItems);
+        rowRender.Render(
+            contentAreaItems,
+            htmlHelper,
+            GetContentAreaItemTemplateTag,
+            GetColumnWidth,
+            base.RenderContentAreaItems);
     }
 
     private IContentData GetAreaItemContent(ContentAreaItem contentAreaItem)
