@@ -325,7 +325,7 @@ public class AdvancedContentAreaRenderer : ContentAreaRenderer
     /// <returns>The active <see cref="ContentAreaItem"/>.</returns>
     protected virtual ContentAreaItem GetCurrentContent(ContentAreaItem contentAreaItem)
     {
-        if (_currentContent == null || !_currentContent.ContentLink.CompareToIgnoreWorkID(contentAreaItem.ContentLink))
+        if (ContentReference.IsNullOrEmpty(_currentContent?.ContentLink) || !_currentContent.ContentLink.CompareToIgnoreWorkID(contentAreaItem.ContentLink))
         {
             _currentContent = contentAreaItem;
         }
